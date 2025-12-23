@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "week-27-monorepo-deployment",
   "private": true,
   "scripts": {
     "build": "turbo run build",
