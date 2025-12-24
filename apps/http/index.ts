@@ -1,33 +1,47 @@
-import express from "express";
+import express, { type Request, type Response } from "express";
 import { prisma } from "@repo/db/client";
 
 const app = express();
+app.use(express.json());
 
-app.get("/user", async (req, res) => {
-    const users = await prisma.user.findMany();
-    return res.status(200).json({
-        users,
-        "message": "all users fetched successfully !" 
-    })
+app.get("/users", async (req: Request, res: Response) => {
+    try {
+        const users = await prisma.user.findMany();
+        return res.status(200).json({
+            "message": "all users fetched successfully !",
+            users
+        })
+    } 
+    catch (err) {
+        return res.status(500).json({ err })
+    }
 })
 
-app.post("/sign-up", async (req, res) => {
-    const {username, password} = req.body;
+app.post("/sign-up", async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+
     if(!username || !password) 
         return res.status(400).json({
             "message": "username or password is not provided"
         })
 
-    await prisma.user.create({
-        data: {
-            username,
-            password
-        }
-    });
+    try{
+        await prisma.user.create({
+            data: {
+                username,
+                password
+            }
+        });
 
-    return res.status(201).json({
-        "message": "user signed-up successfully !"
-    })
+        return res.status(201).json({
+            "message": "user signed-up successfully !"
+        })
+    }
+    catch(err: any){
+        return res.status(500).json({ err })
+    }
 })
 
-app.listen(3000);
+app.listen(process.env.PORT, () => {
+    console.log(`app is listening on the port: ${process.env.PORT}`);
+});
